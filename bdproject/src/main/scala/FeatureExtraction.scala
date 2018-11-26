@@ -24,14 +24,15 @@ object FeatureExtraction {
     val inputDataFrame = loadFileModel(hdfs_folder+"some_file",sc)
 
     val tokenizer = new Tokenizer().setInputCol("text").setOutputCol("words")
+    val stopWords = new StopWordsRemover().setInputCol(tokenizer.getOutputCol).setOutputCol("cleanWords")
     val hashingTF = new HashingTF()
       .setNumFeatures(1000)
-      .setInputCol(tokenizer.getOutputCol)
+      .setInputCol(stopWords.getOutputCol)
       .setOutputCol("features")
 
     val model = new LogisticRegression() //another model should be used
     val pipeline = new Pipeline()
-      .setStages(Array(tokenizer, hashingTF, model))
+      .setStages(Array(tokenizer, stopWords, hashingTF, model))
 
 
     //TODO model
