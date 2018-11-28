@@ -23,7 +23,7 @@ object Main {
     val training = session.read
       .format("csv")
       .option("header", "true")
-      .load("file:///C:/cygwin64/home/evger/twitter-classifier/src/main/resources/train.csv")
+      .load("file:///C:/cygwin64/home/twitter-classifier/src/main/resources/train.csv")
     val df = training.withColumn("Sentiment", training.col("Sentiment").cast(IntegerType))
     df.show(20)
 
