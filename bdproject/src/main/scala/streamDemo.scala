@@ -11,7 +11,6 @@ import org.jsoup.Jsoup
 object streamDemo {
   def main(args: Array[String]) {
     val durationSeconds = 10
-    //val conf = new SparkConf().setAppName("RSS Spark Application").setIfMissing("spark.master", "local[*]")
     val conf = new SparkConf().setAppName("RSS Spark Application").setIfMissing("spark.master", "local[*]")
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(durationSeconds))
@@ -26,7 +25,6 @@ object streamDemo {
       import spark.sqlContext.implicits._
       var df = rdd.toDF()
       df.show()
-      val descrCol = df("description")
       val noHTML = udf { s: String => Jsoup.parse(s) }
       df.withColumn("tweet", noHTML(df("description")))
       df.select("tweet")
