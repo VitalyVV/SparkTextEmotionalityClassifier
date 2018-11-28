@@ -7,7 +7,7 @@ import org.apache.spark.sql.{SparkSession}
 import org.apache.spark.sql.types.IntegerType
 
 
-object Main {
+object Model {
   def main(args: Array[String]) {
     val config = new SparkConf()
       .setMaster("local[*]")
