@@ -28,8 +28,8 @@ object streamDemo {
       df.show()
       val descrCol = df("description")
       val noHTML = udf { s: String => Jsoup.parse(s) }
-
       df.withColumn("tweet", noHTML(df("description")))
+      df.select("tweet")
     })
 
     // run forever
