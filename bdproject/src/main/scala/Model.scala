@@ -19,7 +19,7 @@ object Model {
       .master("local")
       .getOrCreate()
 
-    val training = session.read-----
+    val training = session.read
       .format("csv")
       .option("header", "true")
       .load("hdfs://Sentiment/twitter/train.csv")
