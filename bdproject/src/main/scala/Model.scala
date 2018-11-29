@@ -19,10 +19,10 @@ object Model {
       .master("local")
       .getOrCreate()
 
-    val training = session.read
+    val training = session.read-----
       .format("csv")
       .option("header", "true")
-      .load("hdfs:///Sentiment/twitter/train.csv")
+      .load("hdfs://Sentiment/twitter/train.csv")
 
     val df = training.withColumn("Sentiment", training.col("Sentiment").cast(IntegerType))
 
@@ -42,21 +42,9 @@ object Model {
     println("###" * 10)
     println(model)
     println("###" * 10)
-    val observations = model.transform(test.toDF("ItemID", "Sentiment", "SentimentText"))
-
-    val predictionLabelsRDD = observations.select("prediction", "Sentiment").rdd.map { r =>
-      val a = java.lang.Double.parseDouble(r.get(0).toString)
-      val b = java.lang.Double.parseDouble(r.get(1).toString)
-      (a * 1.0, b * 1.0)
-    }
-    val metrics = new BinaryClassificationMetrics(predictionLabelsRDD)
-    val precision = metrics.precisionByThreshold
-    precision.foreach { case (t, p) =>
-      println(s"Threshold: $t, Precision: $p")
-    }
 
     model.save("model")
-
+    println("Model had been saved")
     session.stop()
   }
 
