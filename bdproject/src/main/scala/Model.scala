@@ -7,7 +7,7 @@ import org.apache.spark.sql.{SparkSession}
 import org.apache.spark.sql.types.IntegerType
 
 
-object Main {
+object Model {
   def main(args: Array[String]) {
     val config = new SparkConf()
       .setMaster("local[*]")
@@ -31,21 +31,22 @@ object Main {
 
     val dfs = train.toDF("ItemID", "label", "SentimentText")
 
-    val tokenizer = new Tokenizer()
-      .setInputCol("SentimentText")
-      .setOutputCol("Variants")
+//     val tokenizer = new Tokenizer()
+//       .setInputCol("SentimentText")
+//       .setOutputCol("Variants")
 
-    val hashingTF = new HashingTF()
-      .setNumFeatures(1000)
-      .setInputCol(tokenizer.getOutputCol)
-      .setOutputCol("features")
+//     val hashingTF = new HashingTF()
+//       .setNumFeatures(1000)
+//       .setInputCol(tokenizer.getOutputCol)
+//       .setOutputCol("features")
 
     val lsvc = new LinearSVC()
       .setMaxIter(10)
       .setRegParam(0.1)
 
-    val pipeline = new Pipeline()
-      .setStages(Array(tokenizer, hashingTF, lsvc))
+    val (stage1, stage2, stage3) = buildFeatureSelection("SentimentText")
+
+    val pipeline = new Pipeline().setStages(Array(stage1, stage2, stage3, lsvc))
 
     val model = pipeline.fit(dfs)
     println("###" * 10)
@@ -67,5 +68,22 @@ object Main {
     model.save("model")
 
     session.stop()
+  }
+  
+  def buildFeatureSelection(inputColumn: String): (RegexTokenizer, StopWordsRemover, HashingTF) = {
+    val regexTokenizer = new RegexTokenizer()
+      .setInputCol(inputColumn)
+      .setOutputCol("words")
+      .setPattern("(\\@\\w+)|\\W+")
+
+    val stopWords = new StopWordsRemover().
+      setInputCol(regexTokenizer.getOutputCol).setOutputCol("cleanWords")
+
+    val hashingTF = new HashingTF()
+      .setNumFeatures(1000)
+      .setInputCol(regexTokenizer.getOutputCol)
+      .setOutputCol("features")
+
+    (regexTokenizer, stopWords, hashingTF)
   }
 }
