@@ -28,7 +28,8 @@ object Model {
 
     val Array(train, test) = df.randomSplit(Array[Double](0.7, 0.3))
 
-    val dfs = train.toDF("ItemID", "label", "SentimentText")
+    val dfs = normalize(train.toDF("ItemID", "label", "SentimentText"), "SentimentText", 
+      "ItemID", "label")
 
     val lsvc = new LinearSVC()
       .setMaxIter(10)
@@ -63,5 +64,18 @@ object Model {
       .setOutputCol("features")
 
     (regexTokenizer, stopWords, hashingTF)
+  }
+  
+  def normalize(datafr: DataFrame, column: String, idCol: String, labelCol:String): DataFrame = {
+    var norFrame = datafr.select(clean()(col(column)).as("normalized"))
+    norFrame.show()
+
+    norFrame = norFrame.withColumn("id", monotonically_increasing_id())
+
+    val mydf = datafr.as("df1").join(norFrame.as("df2"), datafr(idCol) === norFrame("id"), "inner")
+      .select("df1."+idCol, "df1."+labelCol, "df2.normalized")
+
+    mydf.withColumnRenamed("normalized", column)
+
   }
 }
