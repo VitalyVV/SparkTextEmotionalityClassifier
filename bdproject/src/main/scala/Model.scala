@@ -1,9 +1,9 @@
 import org.apache.spark.ml.Pipeline
 import org.apache.spark._
 import org.apache.spark.ml.classification.{LinearSVC, LogisticRegression}
-import org.apache.spark.ml.feature.{HashingTF, LabeledPoint, Tokenizer}
+import org.apache.spark.ml.feature._
 import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
-import org.apache.spark.sql.{SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.IntegerType
 
 
@@ -12,7 +12,6 @@ object Model {
     val config = new SparkConf()
       .setMaster("local[*]")
       .setAppName("Test app")
-      .set("spark.driver.bindAddress", "127.0.0.1") // todo: remove it later
 
     val session = SparkSession.builder()
       .config(config)
@@ -24,21 +23,12 @@ object Model {
       .format("csv")
       .option("header", "true")
       .load("hdfs:///Sentiment/twitter/train.csv")
+
     val df = training.withColumn("Sentiment", training.col("Sentiment").cast(IntegerType))
-    df.show(20)
 
     val Array(train, test) = df.randomSplit(Array[Double](0.7, 0.3))
 
     val dfs = train.toDF("ItemID", "label", "SentimentText")
-
-//     val tokenizer = new Tokenizer()
-//       .setInputCol("SentimentText")
-//       .setOutputCol("Variants")
-
-//     val hashingTF = new HashingTF()
-//       .setNumFeatures(1000)
-//       .setInputCol(tokenizer.getOutputCol)
-//       .setOutputCol("features")
 
     val lsvc = new LinearSVC()
       .setMaxIter(10)
@@ -69,7 +59,7 @@ object Model {
 
     session.stop()
   }
-  
+
   def buildFeatureSelection(inputColumn: String): (RegexTokenizer, StopWordsRemover, HashingTF) = {
     val regexTokenizer = new RegexTokenizer()
       .setInputCol(inputColumn)
