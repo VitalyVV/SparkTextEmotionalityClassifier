@@ -5,6 +5,9 @@ import org.apache.spark.ml.feature._
 import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.functions.regexp_replace
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.monotonically_increasing_id
 
 
 object Model {
