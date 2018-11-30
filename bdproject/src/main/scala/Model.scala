@@ -65,7 +65,7 @@ object Model {
     reg1
   }
 
-  def buildFeatureSelection(inputColumn: String): (RegexTokenizer, StopWordsRemover, CountVectorizer) = {
+  def buildFeatureSelection(inputColumn: String): (RegexTokenizer, StopWordsRemover, HashingTF) = {
     val regexTokenizer = new RegexTokenizer()
       .setInputCol(inputColumn)
       .setOutputCol("words")
@@ -74,15 +74,13 @@ object Model {
     val stopWords = new StopWordsRemover().
       setInputCol(regexTokenizer.getOutputCol).setOutputCol("cleanWords")
 
-//     val hashingTF = new HashingTF()
-//       .setNumFeatures(1000)
-//       .setInputCol(regexTokenizer.getOutputCol)
-//       .setOutputCol("features")
-    val countvec = new CountVectorizer()
+    val hashingTF = new HashingTF()
+      .setNumFeatures(1000)
       .setInputCol(regexTokenizer.getOutputCol)
       .setOutputCol("features")
 
-    (regexTokenizer, stopWords, countvec)
+
+    (regexTokenizer, stopWords, hashingTF)
   }
   
   def normalize(datafr: DataFrame, column: String, idCol: String, labelCol:String): DataFrame = {
