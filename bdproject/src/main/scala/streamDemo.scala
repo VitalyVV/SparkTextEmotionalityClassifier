@@ -26,7 +26,7 @@ object streamDemo {
       import spark.sqlContext.implicits._
       var df = rdd.toDF()
       df.filter($"description".contains("lang=\"en\""))
-      val noHTML = udf { s: String => Jsoup.parse(s) }
+      val noHTML = udf { s: String => Jsoup.parse(s).body().text() }
       df.withColumn("tweet", noHTML(df("description")))
       df.select("tweet")
       df.show()
