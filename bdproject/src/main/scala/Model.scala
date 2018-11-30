@@ -48,12 +48,25 @@ object Model {
     println("Model had been saved")
     session.stop()
   }
+  
+  def clean()(col:Column): Column = {
+
+    var reg1 = regexp_replace(col,"\\' ", " ")
+    reg1 = regexp_replace(reg1,"\\'\\w+", "")
+    reg1 = regexp_replace(reg1, "e+", "e")
+    reg1 = regexp_replace(reg1, "o+", "o")
+    reg1 = regexp_replace(reg1, "a+", "a")
+    reg1 = regexp_replace(reg1, "i+", "i")
+    reg1 = regexp_replace(reg1, "y+", "y")
+    reg1 = regexp_replace(reg1, "(?<!\\s)in", "ing")
+    reg1
+  }
 
   def buildFeatureSelection(inputColumn: String): (RegexTokenizer, StopWordsRemover, HashingTF) = {
     val regexTokenizer = new RegexTokenizer()
       .setInputCol(inputColumn)
       .setOutputCol("words")
-      .setPattern("(\\@\\w+)|\\W+")
+      .setPattern("(\\@\\w+)|\\W+|(http\\:\\/\\/\\w+)|(https\\:\\/\\/\\w+)")
 
     val stopWords = new StopWordsRemover().
       setInputCol(regexTokenizer.getOutputCol).setOutputCol("cleanWords")
