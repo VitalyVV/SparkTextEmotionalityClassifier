@@ -48,7 +48,7 @@ object streamDemo {
         df = df.as("df1")
           .join(normalizeddf.as("df2"), df("ItemID") === normalizeddf("id"), "inner")
           .select("df1."+"ItemID", "df1.uri", "df1.title","df1.authors", "df2.normalized")
-        df = df.withColumnRenamed("normalized", "tweet")
+        df = df.withColumnRenamed("normalized", "SentimentText")
 
         df.show()
         val res = model.transform(df)
