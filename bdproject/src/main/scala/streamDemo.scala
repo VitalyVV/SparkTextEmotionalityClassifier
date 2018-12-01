@@ -30,6 +30,18 @@ object streamDemo {
       df.withColumn("tweet", noHTML(df("description")))
       df.select("tweet")
       df.show()
+      
+      
+      df = df.withColumn("ItemID", monotonically_increasing_id())
+      val normalizeddf = extractor.normalize(df, "tweet", "ItemID")
+      df = df.as("df1").join(normalizeddf.as("df2"), df("ItemID") === normalizeddf("id"), "inner")
+        .select("df1."+"ItemID", "df1.uri", "df1.title","df1.authors", "df2.normalized")
+      df = df.withColumnRenamed("normalized", "tweet")
+
+      df.show()
+
+      val model = Pipeline.read.load("hdfs://model")
+      val res = model.transform(df)
     })
 
     // run forever
