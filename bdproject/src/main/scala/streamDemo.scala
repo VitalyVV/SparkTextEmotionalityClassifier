@@ -42,6 +42,8 @@ object streamDemo {
 
       val model = Pipeline.read.load("hdfs://model")
       val res = model.transform(df)
+      
+      df.write.mode("append").csv("hdfs://output.csv")
     })
 
     // run forever
