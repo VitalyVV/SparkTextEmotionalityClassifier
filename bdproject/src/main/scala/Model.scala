@@ -46,7 +46,7 @@ object Model {
       .setMaxIter(10)
       .setRegParam(0.1)
 
-    val (stage1, stage2, stage3) = buildFeatureSelection("SentimentText")
+    val (stage1, stage2, stage3) = extractor.buildFeatureSelection("SentimentText")
 
     val pipeline = new Pipeline().setStages(Array(stage1, stage2, stage3, lsvc))
 
